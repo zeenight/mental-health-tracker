@@ -5,7 +5,8 @@ from main.views import register
 from main.views import login_user
 from main.views import logout_user
 from main.views import edit_mood
-from main.views import delete_mood
+from main.views import delete_mood, add_mood_entry_ajax
+
 
 app_name = 'main'
 
@@ -16,11 +17,14 @@ urlpatterns = [
     path('json/', show_json, name='show_json'),
     path('xml/<str:id>/', show_xml_by_id, name='show_xml_by_id'),
     path('json/<str:id>/', show_json_by_id, name='show_json_by_id'),
-    #turoeial 3
+    #TUTORIAL 3
     path('register/', register, name='register'),
     path('login/', login_user, name='login'),
     path('logout/', logout_user, name='logout'),
+    #TUTORIAL 4
     path('edit-mood/<uuid:id>', edit_mood, name='edit_mood'),
     path('delete/<uuid:id>', delete_mood, name='delete_mood'),
+    #TUTORIAL 5
+     path('create-mood-entry-ajax', add_mood_entry_ajax, name='add_mood_entry_ajax'),
 ]
 

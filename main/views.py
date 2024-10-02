@@ -14,18 +14,22 @@ import datetime
 from django.http import HttpResponseRedirect
 from django.urls import reverse
 from django.shortcuts import reverse
-
+#TUTORIAL 5
+from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.http import require_POST
+from django.utils.html import strip_tags
 
 # Create your views here.
 @login_required(login_url='/login')
 def show_main(request):
-    mood_entries = MoodEntry.objects.filter(user=request.user)
+    # mood_entries = MoodEntry.objects.filter(user=request.user)
+    data = MoodEntry.objects.filter(user=request.user)
 
     context = {
         'name': request.user.username,
         'class': 'PBP D',
         'npm': '2306123456',
-        'mood_entries': mood_entries,
+        # 'mood_entries': mood_entries,
         'last_login': request.COOKIES['last_login'],
     }
 
@@ -79,11 +83,13 @@ def login_user(request):
       form = AuthenticationForm(data=request.POST)
 
       if form.is_valid():
-            user = form.get_user()
-            login(request, user)
-            response = HttpResponseRedirect(reverse("main:show_main"))
-            response.set_cookie('last_login', str(datetime.datetime.now()))
-            return response
+         user = form.get_user()
+         login(request, user)
+         response = HttpResponseRedirect(reverse("main:show_main"))
+         response.set_cookie('last_login', str(datetime.datetime.now()))
+         return response
+      else:  # This block should be aligned with the 'if form.is_valid()'
+         messages.error(request, "Invalid username or password. Please try again.")
 
    else:
       form = AuthenticationForm(request)
@@ -122,3 +128,26 @@ def delete_mood(request, id):
     mood.delete()
     # Kembali ke halaman awal
     return HttpResponseRedirect(reverse('main:show_main'))
+
+
+    #TUTORIAL 5
+
+
+@csrf_exempt
+@require_POST
+def add_mood_entry_ajax(request):
+    mood = strip_tags(request.POST.get("mood")) # strip HTML tags!
+    feelings = strip_tags(request.POST.get("feelings")) # strip HTML tags!
+    mood_intensity = request.POST.get("mood_intensity")
+    user = request.user
+    
+
+    new_mood = MoodEntry(
+        mood=mood, feelings=feelings,
+        mood_intensity=mood_intensity,
+        user=user
+    )
+    new_mood.save()
+
+    return HttpResponse(b"CREATED", status=201)
+    
